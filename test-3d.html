@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>dogstar.fun :: 3D test</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { margin: 0; background: #0000FF; color: #FFFF00; font-family: Tahoma, Arial, sans-serif; font-size: 13px; }
+  .strobe { background: #FF0000; color: #FFFF00; font: 28px Impact, sans-serif; text-align: center; padding: 6px; animation: strobe .4s step-end infinite; }
+  @keyframes strobe { 50% { background: #FFFF00; color: #FF0000; } }
+  .marquee { overflow: hidden; white-space: nowrap; background: #FF00FF; color: #fff; font: bold 14px Courier, monospace; border: 2px inset #c0c0c0; }
+  .marquee span { display: inline-block; padding-left: 100%; animation: crawl 12s linear infinite; }
+  @keyframes crawl { to { transform: translateX(-100%); } }
+  table.shelf { margin: 16px auto; border-collapse: separate; border-spacing: 8px; }
+  td.box { width: 220px; border: 4px outset #c0c0c0; vertical-align: top; text-align: center; padding: 4px; }
+  td.box:nth-child(1) { background: #FF00FF; }
+  td.box:nth-child(2) { background: #FFFF00; color: #0000FF; }
+  td.box:nth-child(3) { background: #FF0000; }
+  td.box canvas { display: block; width: 208px; height: 208px; border: 2px inset #c0c0c0; }
+  .name { font: 20px Impact, sans-serif; margin-top: 4px; }
+  .price s { opacity: .7; }
+  .price b { font: 18px Impact, sans-serif; color: #fff; background: #000; padding: 0 4px; }
+  .foot { text-align: center; font: 11px Courier, monospace; }
+  .foot b { background: #000; color: #0f0; padding: 1px 4px; letter-spacing: 2px; }
+  @media (max-width: 720px) { table.shelf, table.shelf tbody, table.shelf tr { display: block; } td.box { display: block; margin: 8px auto; } }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div class="strobe">!!! TOTAL LIQUIDATION !!! EVERYTHING MUST GO !!!</div>
+<div class="marquee"><span>LAST 3 SPOTS ::: PRICES FLIP EVERY 4 SECONDS ::: SIGN MY GUESTBOOK ::: THIS PAGE IS UNDER CONSTRUCTION ::: BEST VIEWED IN 1024x768</span></div>
+
+<table class="shelf"><tr>
+  <td class="box"><canvas data-glb="props/heat_death_cocoa.glb" data-dist="0.32"></canvas>
+    <div class="name">HEAT DEATH COCOA</div><div class="price"><s>$49.99</s> <b data-price>$4.99</b></div></td>
+  <td class="box"><canvas data-glb="props/dog_star_kibble.glb" data-dist="0.62"></canvas>
+    <div class="name">DOG STAR KIBBLE</div><div class="price"><s>$89.99</s> <b data-price>$8.99</b></div></td>
+  <td class="box"><canvas data-glb="props/cold_sun_lozenge.glb" data-dist="0.24" data-tilt="1.1"></canvas>
+    <div class="name">COLD SUN LOZENGES</div><div class="price"><s>$19.99</s> <b data-price>$1.99</b></div></td>
+</tr></table>
+
+<div class="foot">YOU ARE VISITOR <b id="hits">0004119</b> :: 3D TEST PAGE, NOT index.html</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const loader = new GLTFLoader();
+const spinners = [];
+
+for (const canvas of document.querySelectorAll('canvas[data-glb]')) {
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+  renderer.setClearColor(0x000000, 0);                 // transparent: the box colour shows through
+  const scene = new THREE.Scene();
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 10);
+  const pivot = new THREE.Group();
+  scene.add(pivot);
+
+  loader.load(canvas.dataset.glb, (gltf) => {
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    model.position.sub(box.getCenter(new THREE.Vector3()));   // centre on the spin axis
+    pivot.add(model);
+    const d = +canvas.dataset.dist;
+    camera.position.set(0, d * (+canvas.dataset.tilt || 0.25), d);
+    camera.lookAt(0, 0, 0);
+  }, undefined, (err) => { canvas.replaceWith(Object.assign(document.createElement('div'), { textContent: 'ERROR 404 PRODUCT NOT FOUND' })); console.error(err); });
+
+  spinners.push({ renderer, scene, camera, pivot });
+}
+
+const clock = new THREE.Clock();
+renderer_loop();
+function renderer_loop() {
+  const dt = clock.getDelta();
+  for (const s of spinners) { s.pivot.rotation.y += dt * 1.2; s.renderer.render(s.scene, s.camera); }
+  requestAnimationFrame(renderer_loop);
+}
+
+// flipping prices + hit counter
+setInterval(() => {
+  for (const b of document.querySelectorAll('[data-price]')) b.textContent = '$' + (Math.random() * 9 + 0.99).toFixed(2);
+}, 4000);
+const hits = document.getElementById('hits');
+setInterval(() => { hits.textContent = String(+hits.textContent + 1 + (Math.random() * 3 | 0)).padStart(7, '0'); }, 900);
+</script>
+</body>
+</html>
