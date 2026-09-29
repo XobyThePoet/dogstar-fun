@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DOGSTAR.FUN | $HEART</title>
+<meta name="description" content="DOGSTAR.FUN, a parody exchange by Sirius Heart Productions. There are no coins.">
+<meta property="og:title" content="DOGSTAR.FUN | $HEART is live">
+<meta property="og:description" content="The only coin that can't rug you, because it doesn't exist.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gluten:wght@900&family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600;800&family=Barlow+Condensed:ital,wght@1,700&display=swap" rel="stylesheet">
+<style>
+@font-face { font-family: 'Signal Latin'; src: url(fonts/SignalLatin-Regular.otf); }
+:root {
+  --bg: #0b0e10; --panel: #12171a; --panel2: #192024; --line: #243036; --text: #e8e4d8; --dim: #7d8a88;
+  --up: #b6e32b; --down: #ff4d3a; --persimmon: #e2603a; --teal: #3f7f82; --blue: #2b3fd9; --bone: #f1e9d8;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 Inter, system-ui, sans-serif; }
+body { min-height: 100vh; overflow-x: hidden; }
+a { color: inherit; }
+button { font: inherit; cursor: pointer; border: 0; }
+.mono { font-family: 'IBM Plex Mono', monospace; }
+.sys { font-family: 'Signal Latin', 'IBM Plex Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }
+.screen { display: none; }
+.screen.on { display: block; }
+
+/* ---------- exchange ---------- */
+header { display: flex; align-items: center; gap: 16px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: #0d1113; position: sticky; top: 0; z-index: 5; }
+.logo { font: 900 26px Gluten, sans-serif; color: var(--up); text-shadow: 0 2px 0 var(--blue), 0 4px 0 var(--persimmon); white-space: nowrap; }
+.logo small { font: 12px 'Signal Latin', monospace; color: var(--dim); text-shadow: none; letter-spacing: .1em; margin-left: 4px; }
+.nav { display: flex; gap: 14px; color: var(--dim); font-weight: 600; font-size: 13px; }
+.nav span:first-child { color: var(--text); }
+.grow { flex: 1; }
+.fakebtn { background: var(--panel2); border: 1px solid var(--line); color: var(--text); padding: 7px 12px; border-radius: 8px; font-weight: 600; font-size: 13px; }
+.ticker { overflow: hidden; white-space: nowrap; border-bottom: 1px solid var(--line); background: #0e1316; font: 12px 'IBM Plex Mono', monospace; }
+.ticker div { display: inline-block; padding: 7px 0; animation: tick 40s linear infinite; }
+.ticker b { margin: 0 6px 0 22px; color: var(--text); }
+@keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.up { color: var(--up); } .down { color: var(--down); }
+.koth { margin: 12px 16px 0; padding: 10px 14px; border-radius: 10px; background: linear-gradient(90deg, #2a1a07, #3b1d10 60%, #1a1030); border: 1px solid #e2603a66; display: flex; align-items: center; gap: 12px; font-weight: 800; }
+.koth .crown { font-size: 22px; }
+.koth em { font: italic 700 18px 'Barlow Condensed', sans-serif; color: var(--persimmon); }
+main.grid { display: grid; grid-template-columns: 1fr 360px; gap: 12px; padding: 12px 16px 16px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+.tok { display: flex; gap: 14px; align-items: center; padding: 14px; }
+.tok .pfp { width: 64px; height: 64px; border-radius: 12px; background: radial-gradient(circle at 40% 35%, #fff6 0 8%, transparent 9%), radial-gradient(circle, #e2603a 0 45%, #7a1c10 70%); display: grid; place-items: center; font: 900 30px Gluten; color: #fff3c4; flex: none; }
+.tok h1 { margin: 0; font-size: 20px; }
+.tok .sub { color: var(--dim); font-size: 12px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border-top: 1px solid var(--line); }
+.stats div { background: var(--panel); padding: 10px 14px; }
+.stats b { display: block; font: 600 16px 'IBM Plex Mono', monospace; }
+.stats span { color: var(--dim); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.chartwrap { position: relative; height: 380px; }
+#chart { width: 100%; height: 100%; display: block; }
+.rugged { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; font: 900 54px Gluten; color: var(--down); text-shadow: 0 4px 0 #000; transform: rotate(-8deg); pointer-events: none; }
+.rugged.show { display: flex; }
+.tabs { display: flex; gap: 18px; padding: 10px 14px; border-bottom: 1px solid var(--line); color: var(--dim); font-weight: 600; }
+.tabs span:first-child { color: var(--text); }
+table { width: 100%; border-collapse: collapse; font: 12px 'IBM Plex Mono', monospace; }
+td { padding: 6px 14px; border-bottom: 1px solid #1c2428; white-space: nowrap; }
+#trades tr:first-child { animation: flash 0.8s; }
+@keyframes flash { from { background: #b6e32b22; } to { background: transparent; } }
+.side { display: flex; flex-direction: column; gap: 12px; }
+.buy { padding: 14px; }
+.bs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+.bs div { text-align: center; padding: 9px; border-radius: 8px; font-weight: 800; background: var(--panel2); color: var(--dim); }
+.bs div.on { background: var(--up); color: #111; }
+.amt { display: flex; align-items: center; justify-content: space-between; background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font: 600 18px 'IBM Plex Mono', monospace; }
+.quick { display: flex; gap: 6px; margin: 8px 0 12px; }
+.quick span { flex: 1; text-align: center; background: var(--panel2); border-radius: 6px; padding: 5px; font-size: 12px; color: var(--dim); }
+#ape { width: 100%; padding: 16px; border-radius: 10px; background: linear-gradient(180deg, #d4ff4f, #8fc41c); color: #0b0e10; font: 900 22px Gluten; letter-spacing: 1px; box-shadow: 0 0 0 0 #b6e32b88; animation: pulse 1.4s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 16px #b6e32b00; } 100% { box-shadow: 0 0 0 0 #b6e32b00; } }
+#knowball { display: block; margin: 12px auto 0; background: none; color: var(--dim); font-size: 12px; text-decoration: underline dotted; }
+.curve { padding: 14px; }
+.bar { height: 10px; background: var(--panel2); border-radius: 6px; overflow: hidden; margin: 8px 0 6px; }
+.bar i { display: block; height: 100%; width: 64%; background: linear-gradient(90deg, var(--persimmon), var(--up)); transition: width .6s; }
+.chat { display: flex; flex-direction: column; height: 330px; }
+#chatlog { flex: 1; overflow: hidden; padding: 10px 14px; display: flex; flex-direction: column; justify-content: flex-end; gap: 7px; font-size: 13px; }
+#chatlog p { margin: 0; }
+#chatlog b { font-weight: 800; margin-right: 6px; }
+.holders td:last-child { text-align: right; }
+#apeBar { display: none; position: fixed; left: 10px; right: 10px; bottom: 10px; z-index: 20; }
+#apeBar button { width: 100%; padding: 14px; border-radius: 12px; background: linear-gradient(180deg, #d4ff4f, #8fc41c); color: #0b0e10; font: 900 20px Gluten; box-shadow: 0 6px 24px #000c; }
+footer { color: #56625f; font-size: 11px; text-align: center; padding: 18px 16px 28px; }
+
+/* ---------- director ---------- */
+#director { position: fixed; left: 12px; bottom: 12px; z-index: 50; background: #000d; border: 1px solid var(--persimmon); border-radius: 10px; padding: 10px; display: none; gap: 6px; flex-wrap: wrap; width: 250px; }
+#director.on { display: flex; }
+#director b { width: 100%; font: 11px 'Signal Latin', monospace; letter-spacing: .14em; color: var(--persimmon); }
+#director button { flex: 1; padding: 7px 8px; border-radius: 6px; background: var(--panel2); color: var(--text); font-weight: 700; font-size: 12px; }
+#director button.act { background: var(--persimmon); color: #111; }
+
+/* ---------- scare ---------- */
+#scare { position: fixed; inset: 0; z-index: 100; display: none; overflow: hidden; background: #000; }
+#scare.on { display: block; }
+#scare .bgshot { position: absolute; inset: 0; background: #0b0e10; filter: hue-rotate(160deg) saturate(3) contrast(1.4); opacity: .6; }
+#scare .crack { position: absolute; inset: 0; width: 100%; height: 100%; }
+.shake { animation: shake .4s steps(2) 3; }
+@keyframes shake { 0% { transform: translate(6px, -4px); } 50% { transform: translate(-8px, 5px); } 100% { transform: translate(0); } }
+.pop { position: absolute; width: min(360px, 88vw); background: #c0c0c0; color: #000; border: 2px solid; border-color: #fff #404040 #404040 #fff; box-shadow: 4px 4px 0 #0008; font: 13px 'Comic Sans MS', 'Comic Neue', cursive; animation: popin .15s steps(3); }
+@keyframes popin { from { transform: scale(.3); } }
+.pop .t { background: linear-gradient(90deg, #7a0000, #e2603a); color: #fff; font: bold 12px Tahoma, Verdana, sans-serif; padding: 3px 4px 3px 8px; display: flex; justify-content: space-between; align-items: center; cursor: move; }
+.pop .t i { font-style: normal; background: #c0c0c0; color: #000; border: 1px solid; border-color: #fff #404040 #404040 #fff; width: 18px; height: 16px; display: grid; place-items: center; font-size: 11px; cursor: pointer; }
+.pop .b { padding: 14px; display: flex; gap: 12px; align-items: center; }
+.pop .ico { font-size: 34px; flex: none; }
+.pop .ok { display: block; margin: 0 14px 12px auto; padding: 3px 22px; background: #c0c0c0; border: 2px solid; border-color: #fff #404040 #404040 #fff; font: 12px Tahoma, sans-serif; }
+.pop .prog { height: 16px; border: 2px inset #fff; background: #fff; margin-top: 8px; }
+.pop .prog i { display: block; height: 100%; width: 0; background: repeating-linear-gradient(90deg, #000080 0 10px, #fff 10px 12px); }
+.skull { position: absolute; font-size: 160px; left: 50%; top: 45%; transform: translate(-50%, -50%); animation: spin 1.2s linear infinite; filter: drop-shadow(0 0 20px #f00); pointer-events: none; }
+@keyframes spin { from { transform: translate(-50%, -50%) rotateY(0) rotateZ(-8deg); } to { transform: translate(-50%, -50%) rotateY(360deg) rotateZ(8deg); } }
+.marq { position: absolute; left: 0; right: 0; bottom: 0; background: #ff0; color: #f00; font: bold 22px 'Comic Sans MS', cursive; white-space: nowrap; overflow: hidden; }
+.marq span { display: inline-block; padding: 6px 0; animation: tick 9s linear infinite; }
+.clippy { position: absolute; right: 18px; bottom: 60px; width: 230px; background: #ffffcc; color: #000; border: 1px solid #000; border-radius: 10px; padding: 10px; font: 13px Tahoma, sans-serif; }
+.clippy:after { content: '🐕'; position: absolute; right: 16px; bottom: -44px; font-size: 40px; }
+
+/* ---------- final + ball ---------- */
+.final { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; background: #000c; padding: 16px; }
+.final.on { display: flex; }
+.final .pop { position: relative; width: min(560px, 100%); animation: none; }
+.final .b { display: block; font: 16px/1.5 Tahoma, Verdana, sans-serif; padding: 20px; }
+.final h2 { margin: 0 0 10px; font: bold 22px Tahoma, sans-serif; }
+.final .real { background: #fff; border: 2px inset #fff; padding: 12px; margin: 14px 0; font-family: Georgia, serif; font-size: 17px; }
+.final .links { display: grid; gap: 8px; }
+.final .links a { display: block; padding: 10px 12px; background: #c0c0c0; border: 2px solid; border-color: #fff #404040 #404040 #fff; text-decoration: none; font-weight: bold; }
+.final .tiny { display: block; margin-top: 16px; font-size: 12px; color: #333; text-align: right; }
+#ball { min-height: 100vh; background: radial-gradient(ellipse at 30% 20%, #16363a, #0b1618 60%, #070d0f); padding: 48px 20px; }
+#ball .wrap { max-width: 720px; margin: 0 auto; }
+#ball h2 { font: 900 56px/1 Gluten; color: var(--up); margin: 0 0 12px; text-shadow: 0 3px 0 var(--blue), 0 6px 0 var(--persimmon); }
+#ball p.lead { font-size: 19px; color: #cfd8d6; }
+.support { margin: 28px 0; padding: 22px; border: 1px solid #e2603a88; border-radius: 14px; background: #0006; }
+.support h3 { margin: 0 0 6px; font: 26px 'Signal Latin', monospace; letter-spacing: .1em; color: var(--persimmon); }
+.support .soon { margin-top: 14px; padding: 14px; border-radius: 10px; border: 1px dashed var(--line); color: var(--dim); text-align: center; font-family: 'IBM Plex Mono', monospace; }
+.outlinks { display: flex; flex-wrap: wrap; gap: 10px; }
+.outlinks a { padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; text-decoration: none; background: var(--panel); font-weight: 600; }
+.nothing { margin-top: 26px; }
+.nothing h4 { font: 13px 'Signal Latin', monospace; letter-spacing: .16em; color: var(--dim); margin: 0 0 8px; }
+
+@media (max-width: 900px) {
+  main.grid { grid-template-columns: minmax(0, 1fr); padding: 10px; }
+  .col, .side { min-width: 0; }
+  .card { overflow: hidden; }
+  td { padding: 6px 8px; }
+  header { gap: 10px; padding: 10px; }
+  .logo small { display: none; }
+  .fakebtn { white-space: nowrap; }
+  .koth { margin: 10px 10px 0; font-size: 13px; }
+  .tok .sub { white-space: normal; }
+  .nav, .hide-m { display: none; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .chartwrap { height: 300px; }
+  #apeBar { display: block; }
+  footer { padding-bottom: 96px; }
+  .chat { height: 260px; }
+  #ball h2 { font-size: 42px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================= EXCHANGE ================= -->
+<section id="exchange" class="screen on">
+  <header>
+    <div class="logo">dogstar.fun<small>v0.9 BETA</small></div>
+    <div class="nav"><span>Board</span><span>Advanced</span><span>Create coin</span><span>Leaderboard</span></div>
+    <div class="grow"></div>
+    <div class="fakebtn hide-m">[how it works]</div>
+    <div class="fakebtn">Log in</div>
+  </header>
+  <div class="ticker"><div id="tickerRow"></div></div>
+  <div class="koth"><span class="crown">👑</span><span>KING OF THE HILL</span><em>$HEART just flipped $KIBBLE</em></div>
+
+  <main class="grid">
+    <div class="col">
+      <div class="card">
+        <div class="tok">
+          <div class="pfp">♥</div>
+          <div>
+            <h1>Sirius Heart <span class="mono" style="color:var(--dim);font-size:14px">$HEART</span></h1>
+            <div class="sub mono">CA: DoGsTaR…h34rt · created 11m ago by <u>SIRIUS_DEV</u> · 🐕 dev is doxxed (in a sense)</div>
+          </div>
+        </div>
+        <div class="stats">
+          <div><span>Price</span><b id="sPrice">—</b></div>
+          <div><span>Market cap</span><b id="sMcap">—</b></div>
+          <div><span>24h vol</span><b id="sVol">—</b></div>
+          <div><span>24h</span><b id="sChg">—</b></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="tabs"><span>1s</span><span>1m</span><span>5m</span><span>15m</span><span>1h</span><span class="grow"></span><span class="mono" id="liveDot">● LIVE</span></div>
+        <div class="chartwrap"><canvas id="chart"></canvas><div class="rugged" id="rugged">LIQUIDITY REMOVED</div></div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="tabs"><span>Trades</span><span>Holders</span><span>Thread</span></div>
+        <table><tbody id="trades"></tbody></table>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="card buy">
+        <div class="bs"><div class="on">Buy</div><div>Sell</div></div>
+        <div class="amt"><span>1.00</span><span style="color:var(--dim);font-size:13px">SOL</span></div>
+        <div class="quick"><span>0.1</span><span>0.5</span><span>1</span><span>max (rent)</span></div>
+        <button id="ape">APE IN NOW</button>
+        <button id="knowball">i know ball</button>
+      </div>
+
+      <div class="card curve">
+        <div style="display:flex;justify-content:space-between"><b>bonding curve</b><b class="mono" id="curvePct">64%</b></div>
+        <div class="bar"><i id="curveBar"></i></div>
+        <div style="color:var(--dim);font-size:12px">When the curve hits 100%, $HEART graduates to a market that also doesn't exist.</div>
+      </div>
+
+      <div class="card chat">
+        <div class="tabs"><span>Chat</span><span class="mono" id="online">1,204 online</span></div>
+        <div id="chatlog"></div>
+      </div>
+
+      <div class="card holders">
+        <div class="tabs"><span>Top holders</span></div>
+        <table><tbody>
+          <tr><td>bonding curve 🏦</td><td>61.2%</td></tr>
+          <tr><td>SIRIUS_DEV 🐕</td><td>18.0%</td></tr>
+          <tr><td>your_other_wallet</td><td>17.9%</td></tr>
+          <tr><td>7xQ…f3k</td><td>0.4%</td></tr>
+          <tr><td>you (soon)</td><td>0.0%</td></tr>
+        </tbody></table>
+      </div>
+    </aside>
+  </main>
+  <footer>dogstar.fun is a parody art project by Sirius Heart Productions. There are no coins. Nothing here is for sale, and nothing connects to a wallet.</footer>
+  <div id="apeBar"><button id="ape2">APE IN NOW</button></div>
+</section>
+
+<!-- ================= I KNOW BALL ================= -->
+<section id="ball" class="screen">
+  <div class="wrap">
+    <div class="sys" style="color:var(--dim);margin-bottom:28px">SIRIUS HEART / DOGSTAR.FUN / VERIFIED BALL KNOWER</div>
+    <h2>Correct.</h2>
+    <p class="lead">There is no $HEART. There never was. You're one of maybe five people who read the room instead of the chart.</p>
+    <p class="lead">This whole exchange is a set. The chart is scripted, the chat is written, the holders are me and my other wallet. The only real thing on this page is the guy who built it.</p>
+
+    <div class="support">
+      <h3>SUPPORT THE DEV</h3>
+      <div style="color:#cfd8d6">Fund the villain arc. You get nothing. You were always going to get nothing. That's the product.</div>
+      <div class="soon">[ donation link goes here soon ]</div>
+    </div>
+
+    <div class="outlinks">
+      <a href="https://www.instagram.com/thesiriusheart/" target="_blank" rel="noopener">Instagram @thesiriusheart</a>
+      <a href="https://siriusheart.myportfolio.com" target="_blank" rel="noopener">Portfolio</a>
+      <a href="#" id="backToExchange">← back to the casino</a>
+    </div>
+
+    <div class="nothing">
+      <h4>TOP HOLDERS OF NOTHING</h4>
+      <div style="color:var(--dim)">Slot 1 is open. Be the first.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCARE ================= -->
+<div id="scare">
+  <div class="bgshot"></div>
+  <svg class="crack" viewBox="0 0 100 100" preserveAspectRatio="none" id="crack"></svg>
+  <div class="skull">☠️</div>
+  <div class="clippy">It looks like you're getting rugged. Would you like help?<br><br>• Get rugged<br>• Get rugged (advanced)</div>
+  <div class="marq"><span>★ CONGRATULATION YOU ARE 1,000,000th RUG VICTIM ★ DO NOT TURN OFF COMPUTER ★ IT IS TOO LATE ★ CONGRATULATION YOU ARE 1,000,000th RUG VICTIM ★ DO NOT TURN OFF COMPUTER ★ IT IS TOO LATE ★</span></div>
+</div>
+
+<div class="final" id="final">
+  <div class="pop">
+    <div class="t"><span>SiriusOS · Important Message</span><i>×</i></div>
+    <div class="b">
+      <h2>Stop.</h2>
+      You just tried to buy a coin that doesn't exist, from a stranger on Instagram.<br>
+      <b>Nothing was taken. This time.</b>
+      <div class="real">I used to be you. I built this page instead.</div>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Scareware" target="_blank" rel="noopener">📖 How this page just tricked you (Scareware, Wikipedia)</a>
+        <a href="https://en.wikipedia.org/wiki/Computer_security" target="_blank" rel="noopener">🔒 How to not get actually hacked (Computer security, Wikipedia)</a>
+        <a href="https://en.wikipedia.org/wiki/Problem_gambling" target="_blank" rel="noopener">🎰 Is this a pattern? (Problem gambling, Wikipedia)</a>
+        <a href="tel:18004262537">☎ 1-800-GAMBLER · free, confidential, 24/7 (US)</a>
+      </div>
+      <a href="#" class="tiny" id="laughing">Still here and laughing? You might know ball after all →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ================= DIRECTOR ================= -->
+<div id="director">
+  <b>DIRECTOR · type "dogstar" or add ?director</b>
+  <button data-mode="normal" class="act">normal</button>
+  <button data-mode="pump">pump</button>
+  <button data-mode="dump">dump</button>
+  <button data-mode="rug">RUG</button>
+  <button data-mode="halt">halt</button>
+  <button id="dReset">reset</button>
+  <button id="dScare">scare</button>
+  <button id="dMute">sound: on</button>
+</div>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+
+// ---------- ticker ----------
+const COINS = [['HEART', 1], ['HEATDEATH', 1], ['COLDSUN', -1], ['KIBBLE', 1], ['COLANI', 1], ['RAM', -1], ['SLEEPTRADE', 1], ['BELIZE', -1], ['TIGERBLOOD', 1], ['NOTHING', 1], ['DOGSTAR', 1], ['UNINSTALL', -1]];
+function tickerHTML() {
+  return COINS.map(([s, d]) => `<b>$${s}</b><span class="${d > 0 ? 'up' : 'down'}">${d > 0 ? '+' : '-'}${rand(3, 900).toFixed(1)}%</span>`).join('');
+}
+$('tickerRow').innerHTML = tickerHTML() + tickerHTML();
+
+// ---------- market sim ----------
+const SUPPLY = 1e9;
+let price = 0.0000412, mode = 'normal', vol = 18400, open24 = price * 0.62;
+const candles = [];
+let cur = null, lastCandleAt = 0;
+const CANDLE_MS = 1500, MAX = 90;
+function seed() {
+  candles.length = 0; let p = price * 0.55;
+  for (let i = 0; i < 60; i++) {
+    const o = p; p *= Math.exp(rand(-0.05, 0.065)); const c = p;
+    candles.push({ o, c, h: Math.max(o, c) * (1 + rand(0, .03)), l: Math.min(o, c) * (1 - rand(0, .03)) });
+  }
+  price = p; cur = null;
+}
+seed();
+function step() {
+  if (mode === 'halt') return;
+  let drift = 0, sig = 0.012;
+  if (mode === 'pump') { drift = 0.018; sig = 0.02; }
+  if (mode === 'dump') { drift = -0.022; sig = 0.02; }
+  if (mode === 'rug') { drift = 0; sig = 0.0004; }
+  if (mode === 'normal') drift = 0.0012;
+  price = Math.max(1e-10, price * Math.exp(drift + sig * (Math.random() * 2 - 1)));
+  const now = performance.now();
+  if (!cur || now - lastCandleAt > CANDLE_MS) {
+    if (cur) candles.push(cur);
+    while (candles.length > MAX) candles.shift();
+    cur = { o: price, c: price, h: price, l: price }; lastCandleAt = now;
+  }
+  cur.c = price; cur.h = Math.max(cur.h, price); cur.l = Math.min(cur.l, price);
+  vol += rand(20, 400) * (mode === 'pump' ? 4 : 1);
+}
+function rug() {
+  mode = 'rug';
+  if (cur) candles.push(cur);
+  const o = price; price = price * 0.004;
+  cur = { o, c: price, h: o, l: price }; lastCandleAt = performance.now();
+  $('rugged').classList.add('show');
+  $('liveDot').textContent = '● RUGGED'; $('liveDot').className = 'mono down';
+  addChat('SYSTEM', 'liquidity removed by SIRIUS_DEV 🐕', 'var(--down)');
+  ['dev just pulled 😭', 'NOOOO', 'i sold my car for this', 'called it. didn\'t sell. called it though', 'rip bozo (me)'].forEach((m, i) => setTimeout(() => addChat(pick(NAMES), m), 400 + i * 700));
+}
+
+// ---------- chart ----------
+const cv = $('chart'), ctx = cv.getContext('2d');
+function draw() {
+  const r = cv.getBoundingClientRect(), dpr = devicePixelRatio || 1;
+  if (cv.width !== Math.round(r.width * dpr)) { cv.width = r.width * dpr; cv.height = r.height * dpr; }
+  const W = cv.width, H = cv.height, pad = 50 * dpr;
+  ctx.fillStyle = '#12171a'; ctx.fillRect(0, 0, W, H);
+  const all = cur ? candles.concat([cur]) : candles;
+  const hi = Math.max(...all.map(c => c.h)), lo = Math.min(...all.map(c => c.l));
+  const y = v => 14 * dpr + (H - 40 * dpr) * (1 - (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo) || 1));
+  ctx.strokeStyle = '#1c2428'; ctx.lineWidth = 1; ctx.font = `${10 * dpr}px IBM Plex Mono`; ctx.fillStyle = '#56625f';
+  for (let i = 0; i <= 4; i++) {
+    const v = Math.exp(Math.log(lo) + (Math.log(hi) - Math.log(lo)) * i / 4), yy = y(v);
+    ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(W - pad, yy); ctx.stroke();
+    ctx.fillText((v * SUPPLY / 1000).toFixed(1) + 'K', W - pad + 6 * dpr, yy + 3 * dpr);
+  }
+  const cw = (W - pad) / MAX;
+  all.forEach((c, i) => {
+    const x = i * cw + cw / 2, upc = c.c >= c.o;
+    ctx.strokeStyle = ctx.fillStyle = upc ? '#b6e32b' : '#ff4d3a';
+    ctx.beginPath(); ctx.moveTo(x, y(c.h)); ctx.lineTo(x, y(c.l)); ctx.stroke();
+    const top = y(Math.max(c.o, c.c)), bot = y(Math.min(c.o, c.c));
+    ctx.fillRect(x - cw * 0.35, top, cw * 0.7, Math.max(1, bot - top));
+  });
+  const py = y(price);
+  ctx.setLineDash([4 * dpr, 4 * dpr]); ctx.strokeStyle = '#e2603a'; ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(W - pad, py); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = '#e2603a'; ctx.fillRect(W - pad, py - 9 * dpr, pad, 18 * dpr);
+  ctx.fillStyle = '#111'; ctx.fillText((price * SUPPLY / 1000).toFixed(1) + 'K', W - pad + 4 * dpr, py + 3 * dpr);
+}
+function fmt$(v) { return v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : '$' + (v / 1e3).toFixed(1) + 'K'; }
+function stats() {
+  $('sPrice').textContent = '$' + price.toFixed(8);
+  $('sMcap').textContent = fmt$(price * SUPPLY);
+  $('sVol').textContent = fmt$(vol);
+  const ch = (price / open24 - 1) * 100;
+  $('sChg').textContent = (ch >= 0 ? '+' : '') + ch.toFixed(1) + '%'; $('sChg').className = ch >= 0 ? 'up' : 'down';
+  const pct = mode === 'rug' ? 0 : Math.min(99, Math.max(3, 64 + Math.log(price / 0.0000412) * 40));
+  $('curvePct').textContent = pct.toFixed(0) + '%'; $('curveBar').style.width = pct + '%';
+}
+
+// ---------- trades + chat ----------
+const NAMES = ['7xQ…f3k', 'sleeptrader', 'tigerblood.sol', 'belize_bound', 'colani_chair', 'ram_downloader', 'wifechanger69', 'mcafee_heir', 'kibble_whale', 'dev_is_based', 'jeet_patrol', 'anon', 'Df9…2Lp', 'exit_liquidity', 'gm_gn_ngmi'];
+function addTrade() {
+  if (mode === 'halt') return;
+  const buyside = mode === 'dump' || mode === 'rug' ? Math.random() < 0.15 : Math.random() < (mode === 'pump' ? 0.85 : 0.58);
+  const sol = rand(0.05, mode === 'pump' ? 12 : 3);
+  const row = document.createElement('tr');
+  row.innerHTML = `<td>${pick(NAMES)}</td><td class="${buyside ? 'up' : 'down'}">${buyside ? 'buy' : 'sell'}</td><td>${sol.toFixed(2)} SOL</td><td>${(sol / (price * 180) / 1e6).toFixed(2)}M</td><td style="color:#56625f">${Math.floor(rand(1, 40))}s</td>`;
+  const tb = $('trades'); tb.prepend(row); while (tb.children.length > 9) tb.lastChild.remove();
+}
+const CHAT = {
+  normal: ['is this the one', 'dev is based', 'chart looks like a colani chair', 'gm', 'my wife left but $HEART stayed', 'sleep traded 40 SOL last night, woke up in belize', 'who is selling and why do you hate me', 'this is a cult and i am in it', 'dev pls say something', 'bullish on the dog', 'holding till the heat death of the universe', 'is it too late to get in? (it is)', 'downloaded more RAM to buy more', 'this has the same energy as 2001'],
+  pump: ['LFGGGGG', 'WE ARE SO BACK', 'dev is a genius', 'i am never selling', 'screenshot this', 'told my mom', 'quitting my job tomorrow', 'THE DOG STAR RISES'],
+  dump: ['who sold', 'its fine', 'its fine its fine', 'healthy pullback', 'dev??', 'buying the dip (it keeps dipping)', 'jeets everywhere'],
+  halt: ['is it frozen', 'hello?', 'refresh doesnt work', 'dev is sleeping (sleep trading)']
+};
+function addChat(name, msg, color) {
+  const p = document.createElement('p');
+  const c = color || `hsl(${(name.length * 47) % 360} 70% 65%)`;
+  p.innerHTML = `<b style="color:${c}">${name}</b>${msg}`;
+  const log = $('chatlog'); log.append(p); while (log.children.length > 12) log.firstChild.remove();
+}
+function chatTick() {
+  if (mode === 'rug') return;
+  addChat(pick(NAMES), pick(CHAT[mode] || CHAT.normal));
+  $('online').textContent = Math.round(rand(1100, 1400)).toLocaleString() + ' online';
+}
+
+// ---------- loops ----------
+setInterval(() => { step(); stats(); }, 250);
+setInterval(addTrade, 700);
+setInterval(chatTick, 1800);
+(function frame() { draw(); requestAnimationFrame(frame); })();
+for (let i = 0; i < 6; i++) { addTrade(); chatTick(); }
+
+// ---------- sound (WebAudio, no files) ----------
+let audio = null, muted = false;
+function beep(freq, dur, type = 'square', vol = 0.06, when = 0) {
+  if (muted) return;
+  audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+  const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + when;
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(audio.destination); o.start(t); o.stop(t + dur);
+}
+const errSound = () => { beep(880, .12); beep(660, .18, 'square', .05, .1); };
+const alarm = () => { for (let i = 0; i < 8; i++) beep(i % 2 ? 520 : 780, .16, 'sawtooth', .05, i * .18); };
+
+// ---------- the scare ----------
+const POPS = [
+  ['🦠', 'Yoru cripto accoutn is liquidation. thanks you for donate.'],
+  ['⚠️', 'VIRUS DETECTED: 69 malwares found in your RAM. Do not blink.'],
+  ['💋', '10 single moms in your area are on pump.fun RIGHT NOW'],
+  ['🐕', 'Your wallet is now property of the Dog Star.'],
+  ['💾', 'DOWNLOADING MORE RAM…', true],
+  ['🏆', 'Congratulation!!! You are 1,000,000th rug victim. Claim prize: nothing'],
+  ['🧠', 'SiriusOS has detected a skill issue.'],
+  ['🔌', 'Please do not turn off your computer. It is too late.'],
+  ['📞', 'John McAfee would like to connect on LinkedIn.'],
+  ['🌴', 'Your seed phrase has been moved to Belize for its own protection.'],
+];
+let popCount = 0, scareOn = false, finalTimer = null;
+function crack() {
+  const svg = $('crack'); let d = '';
+  const cx = rand(35, 65), cy = rand(35, 60);
+  for (let i = 0; i < 14; i++) {
+    let x = cx, yy = cy; d += `M${x} ${yy}`;
+    const a = rand(0, Math.PI * 2);
+    for (let k = 0; k < 5; k++) { x += Math.cos(a + rand(-.5, .5)) * rand(6, 14); yy += Math.sin(a + rand(-.5, .5)) * rand(6, 14); d += ` L${x.toFixed(1)} ${yy.toFixed(1)}`; }
+  }
+  svg.innerHTML = `<path d="${d}" stroke="#fff" stroke-width=".25" fill="none" opacity=".85"/>`;
+}
+function spawnPop(ix) {
+  if (!scareOn) return;
+  const [ico, msg, prog] = POPS[ix % POPS.length];
+  const el = document.createElement('div'); el.className = 'pop';
+  const w = Math.min(360, innerWidth * .88);
+  el.style.left = rand(0, Math.max(1, innerWidth - w)) + 'px';
+  el.style.top = rand(0, Math.max(1, innerHeight - 190)) + 'px';
+  el.innerHTML = `<div class="t"><span>${pick(['SiriusOS Security Center', 'DogStar Defender™', 'CRITICAL ALERT!!!', 'RAM Doubler 2001', 'System32 (Dog Edition)'])}</span><i>×</i></div>
+    <div class="b"><div class="ico">${ico}</div><div>${msg}${prog ? '<div class="prog"><i></i></div>' : ''}</div></div><button class="ok">OK</button>`;
+  $('scare').append(el); popCount++; errSound();
+  if (prog) { const bar = el.querySelector('.prog i'); let p = 0; const t = setInterval(() => { p = Math.min(97, p + rand(1, 9)); bar.style.width = p + '%'; if (!scareOn) clearInterval(t); }, 180); }
+  const close = () => { el.remove(); spawnPop(ix + 3); spawnPop(ix + 5); };   // closing one opens two
+  el.querySelector('.ok').onclick = close; el.querySelector('.t i').onclick = close;
+  dragify(el);
+}
+function dragify(el) {
+  const bar = el.querySelector('.t'); let sx, sy, ox, oy;
+  bar.addEventListener('pointerdown', e => { if (e.target.tagName === 'I') return; sx = e.clientX; sy = e.clientY; ox = el.offsetLeft; oy = el.offsetTop; bar.setPointerCapture(e.pointerId); });
+  bar.addEventListener('pointermove', e => { if (sx === undefined || !bar.hasPointerCapture(e.pointerId)) return; el.style.left = ox + e.clientX - sx + 'px'; el.style.top = oy + e.clientY - sy + 'px'; });
+  bar.addEventListener('pointerup', () => sx = undefined);
+}
+function startScare() {
+  if (scareOn) return;
+  scareOn = true; popCount = 0;
+  $('scare').querySelectorAll('.pop').forEach(p => p.remove());
+  crack(); $('scare').classList.add('on'); document.body.classList.add('shake');
+  setTimeout(() => document.body.classList.remove('shake'), 1300);
+  alarm();
+  POPS.forEach((_, i) => setTimeout(() => spawnPop(i), 250 + i * 420));
+  finalTimer = setTimeout(showFinal, 250 + POPS.length * 420 + 3200);
+}
+function showFinal() {
+  clearTimeout(finalTimer);
+  scareOn = false;
+  beep(220, .6, 'sine', .08);
+  $('final').classList.add('on');
+}
+function endScare() {
+  $('final').classList.remove('on'); $('scare').classList.remove('on');
+  $('scare').querySelectorAll('.pop').forEach(p => p.remove());
+}
+$('ape').onclick = startScare;
+$('ape2').onclick = startScare;
+$('final').querySelector('.t i').onclick = () => { endScare(); };
+
+// ---------- navigation ----------
+function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id)); scrollTo(0, 0); }
+$('knowball').onclick = () => show('ball');
+$('laughing').onclick = e => { e.preventDefault(); endScare(); show('ball'); };
+$('backToExchange').onclick = e => { e.preventDefault(); show('exchange'); };
+
+// ---------- director ----------
+function setMode(m) {
+  if (m === 'rug') { if (mode !== 'rug') rug(); }
+  else {
+    if (mode === 'rug') { $('rugged').classList.remove('show'); $('liveDot').textContent = '● LIVE'; $('liveDot').className = 'mono'; }
+    mode = m;
+  }
+  document.querySelectorAll('#director [data-mode]').forEach(b => b.classList.toggle('act', b.dataset.mode === mode));
+}
+document.querySelectorAll('#director [data-mode]').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+$('dReset').onclick = () => { price = 0.0000412; seed(); setMode('normal'); vol = 18400; };
+$('dScare').onclick = startScare;
+$('dMute').onclick = () => { muted = !muted; $('dMute').textContent = 'sound: ' + (muted ? 'off' : 'on'); };
+if (new URLSearchParams(location.search).has('director')) $('director').classList.add('on');
+let typed = '';
+addEventListener('keydown', e => {
+  typed = (typed + e.key.toLowerCase()).slice(-7);
+  if (typed === 'dogstar') $('director').classList.toggle('on');
+  if (!$('director').classList.contains('on')) return;
+  const keys = { '1': 'normal', '2': 'pump', '3': 'dump', '4': 'rug', '5': 'halt' };
+  if (keys[e.key]) setMode(keys[e.key]);
+  if (e.key === '0') startScare();
+});
+</script>
+</body>
+</html>
