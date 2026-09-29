@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>sirius hE'art :: soft club 010</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  @font-face { font-family: "Sirius hEart Display"; src: url("fonts/SiriusHeartDisplay-Regular.otf"); }
+  @font-face { font-family: "Signal Latin"; src: url("fonts/SignalLatin-Regular.otf"); }
+  :root { --ice: #EEF5F8; --glacier: #C4DCE5; --lav: #D3CEEC; --teal: #2E5C60; --deep: #1E3D40; --tang: #EC5800; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; color: var(--deep); font-family: "Signal Latin", Tahoma, sans-serif;
+         background: radial-gradient(ellipse at 50% 20%, #FFFFFF 0%, var(--ice) 35%, var(--glacier) 75%, var(--lav) 100%) fixed; }
+  header { padding: 40px 32px 8px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; }
+  h1 { margin: 0; font: 72px/1 "Sirius hEart Display", sans-serif; color: var(--tang); letter-spacing: -1px; }
+  h1 small { display: block; font-size: 30px; color: var(--teal); margin-top: 6px; }
+  .meta { font-size: 13px; letter-spacing: 3px; text-align: right; line-height: 1.8; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; padding: 24px 32px 48px; }
+  .card { position: relative; border-radius: 28px; padding: 10px 10px 14px; overflow: hidden;
+          background: linear-gradient(160deg, rgba(255,255,255,.75), rgba(255,255,255,.25));
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 10px 30px rgba(46,92,96,.12); backdrop-filter: blur(10px); }
+  .card canvas { display: block; width: 100%; aspect-ratio: 1; border-radius: 20px; }
+  .name { font: 24px/1.1 "Sirius hEart Display", sans-serif; margin: 10px 6px 2px; }
+  .code { font-size: 11px; letter-spacing: 3px; margin: 0 6px; opacity: .7; }
+  .dot { position: absolute; top: 20px; right: 20px; width: 10px; height: 10px; border-radius: 50%; background: var(--tang);
+         box-shadow: 0 0 10px var(--tang); animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .25; } }
+  footer { padding: 0 32px 40px; font-size: 12px; letter-spacing: 3px; opacity: .7; }
+  @media (max-width: 640px) { header, .grid, footer { padding-left: 16px; padding-right: 16px; } h1 { font-size: 48px; } }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<header>
+  <h1>sirius hE'art&#8221;<small>soft club 010</small></h1>
+  <div class="meta">WINTER SUPPLY 2002<br>THE PAST IS NOW<br>RECALL 00:60</div>
+</header>
+<main class="grid" id="grid"></main>
+<footer>SIRIUS HEART PRODUCTIONS :: ELEVEN OBJECTS :: DRAG NOTHING, JUST WATCH</footer>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const ITEMS = [
+  ['console_sleeping_dog', 'sleeping console', 'DREAM RESUME / 8 HOURS'],
+  ['logo_heart_acrylic', "hE'art sign", 'TANGERINE ACRYLIC'],
+  ['controller_bone', 'bone pad', 'WIRED / 4 BUTTONS'],
+  ['discman_sirius', 'sirius discman', 'RECALL 00:60'],
+  ['disc_false_memory', 'false memory', 'COMPACT DISC / 14 TRACKS'],
+  ['jewel_case_false_memory', 'jewel case', 'THE SOUNDTRACK'],
+  ['memory_card_mnem8', 'MNEM-8', '8 HOURS / 1 WINTER'],
+  ['coin_heart', '$HEART coin', 'LIQUID CHROME'],
+  ['star_sirius_crystal', 'sirius crystal', '9,900 K'],
+  ['logo_dogstar_badge', 'dogStar badge', 'FROSTED BONDI'],
+  ['kibble_star_bowl', 'star kibble', 'COMPLETE DINNER'],
+];
+
+const grid = document.getElementById('grid');
+const loader = new GLTFLoader();
+const views = [];
+
+for (const [file, name, code] of ITEMS) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `<canvas></canvas><div class="dot"></div><div class="name"></div><div class="code"></div>`;
+  card.querySelector('.name').textContent = name;
+  card.querySelector('.code').textContent = code;
+  grid.appendChild(card);
+
+  const canvas = card.querySelector('canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setClearColor(0x000000, 0);
+  renderer.toneMapping = THREE.NeutralToneMapping;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xE6F0F4);   // three.js glass refracts the background, so give it the card's ice
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.03).texture;
+  const key = new THREE.DirectionalLight(0xffffff, 1.4); key.position.set(-1, 2, 2); scene.add(key);
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.001, 100);
+  const pivot = new THREE.Group(); scene.add(pivot);
+
+  loader.load(`softclub/${file}.glb`, (gltf) => {
+    const model = gltf.scene;
+    const box = new THREE.Box3().setFromObject(model);
+    model.position.sub(box.getCenter(new THREE.Vector3()));      // spin about the model's own centre
+    pivot.add(model);
+    const size = box.getSize(new THREE.Vector3());
+    const d = Math.max(size.x, size.y, size.z) * 2.3;
+    camera.near = d / 100; camera.far = d * 10; camera.updateProjectionMatrix();
+    camera.position.set(0, d * 0.3, d); camera.lookAt(0, 0, 0);
+  }, undefined, (err) => { card.querySelector('.code').textContent = 'FILE NOT FOUND'; console.error(err); });
+
+  views.push({ canvas, renderer, scene, camera, pivot, phase: Math.random() * 6 });
+}
+
+function resize() {
+  for (const v of views) {
+    const w = v.canvas.clientWidth, h = v.canvas.clientHeight;
+    if (v.canvas.width !== Math.round(w * v.renderer.getPixelRatio())) v.renderer.setSize(w, h, false);
+  }
+}
+const clock = new THREE.Clock();
+(function loop() {
+  resize();
+  const t = clock.getElapsedTime();
+  for (const v of views) {
+    v.pivot.rotation.y = t * 0.45 + v.phase;
+    v.pivot.position.y = Math.sin(t * 0.9 + v.phase) * 0.004 * v.camera.position.z;   // soft float
+    v.renderer.render(v.scene, v.camera);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
