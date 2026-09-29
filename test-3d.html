@@ -36,11 +36,11 @@
 <div class="marquee"><span>LAST 3 SPOTS ::: PRICES FLIP EVERY 4 SECONDS ::: SIGN MY GUESTBOOK ::: THIS PAGE IS UNDER CONSTRUCTION ::: BEST VIEWED IN 1024x768</span></div>
 
 <table class="shelf"><tr>
-  <td class="box"><canvas data-glb="props/heat_death_cocoa.glb" data-dist="0.32"></canvas>
+  <td class="box"><canvas data-glb="props/heat_death_cocoa.glb"></canvas>
     <div class="name">HEAT DEATH COCOA</div><div class="price"><s>$49.99</s> <b data-price>$4.99</b></div></td>
-  <td class="box"><canvas data-glb="props/dog_star_kibble.glb" data-dist="0.62"></canvas>
+  <td class="box"><canvas data-glb="props/dog_star_kibble.glb"></canvas>
     <div class="name">DOG STAR KIBBLE</div><div class="price"><s>$89.99</s> <b data-price>$8.99</b></div></td>
-  <td class="box"><canvas data-glb="props/cold_sun_lozenge.glb" data-dist="0.24" data-tilt="1.1"></canvas>
+  <td class="box"><canvas data-glb="props/cold_sun_lozenge.glb"></canvas>
     <div class="name">COLD SUN LOZENGES</div><div class="price"><s>$19.99</s> <b data-price>$1.99</b></div></td>
 </tr></table>
 
@@ -70,8 +70,10 @@ for (const canvas of document.querySelectorAll('canvas[data-glb]')) {
     const box = new THREE.Box3().setFromObject(model);
     model.position.sub(box.getCenter(new THREE.Vector3()));   // centre on the spin axis
     pivot.add(model);
-    const d = +canvas.dataset.dist;
-    camera.position.set(0, d * (+canvas.dataset.tilt || 0.25), d);
+    const size = box.getSize(new THREE.Vector3());
+    const d = Math.max(size.x, size.y, size.z) * 2.4;          // fit any model, Codex 007's rule
+    camera.far = d * 10; camera.updateProjectionMatrix();
+    camera.position.set(0, d * 0.25, d);
     camera.lookAt(0, 0, 0);
   }, undefined, (err) => { canvas.replaceWith(Object.assign(document.createElement('div'), { textContent: 'ERROR 404 PRODUCT NOT FOUND' })); console.error(err); });
 
@@ -82,7 +84,7 @@ const clock = new THREE.Clock();
 renderer_loop();
 function renderer_loop() {
   const dt = clock.getDelta();
-  for (const s of spinners) { s.pivot.rotation.y += dt * 1.2; s.renderer.render(s.scene, s.camera); }
+  for (const s of spinners) { s.pivot.rotation.y += dt * 0.65; s.renderer.render(s.scene, s.camera); }
   requestAnimationFrame(renderer_loop);
 }
 
